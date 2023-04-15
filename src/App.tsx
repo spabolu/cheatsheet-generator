@@ -1,4 +1,4 @@
-import React, { ReactNode, useState, ChangeEvent } from 'react';
+import React, { ReactNode, useRef, useState, ChangeEvent } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import remarkMath from 'remark-math';
@@ -77,8 +77,13 @@ const App: React.FC = () => {
     setColumns(newColumns);
   };
 
+  const markdownContainerRef = useRef<HTMLDivElement>(null);
+
   const generatePDF = () => {
-    console.log('PDF generated!');
+    if (!markdownContainerRef.current) return;
+
+    // what if we take everything in markdownContainerRef
+    // and put it in a new page and print that page with the right formatting?
   };
 
   return (
@@ -89,12 +94,17 @@ const App: React.FC = () => {
             key={index}
             className="m-2 h-1/3 border-2 border-red-300 p-2"
             onChange={(e) => handleColumnChange(e, index)}
+            placeholder="Type your markdown here..."
           />
         ))}
       </div>
 
-      <div className="flex h-screen w-1/2 flex-col">
-        <div className="my-2 flex h-full flex-row border-2 border-indigo-300">
+      <div className=" flex h-screen w-1/2 flex-col" id="paper">
+        <p className="mt-1 text-stone-700">Preview: </p>
+        <div
+          ref={markdownContainerRef}
+          className="mb-2 mr-2 flex h-full flex-row border-2 border-indigo-300"
+        >
           {columns.map((column, index) => (
             <ReactMarkdown
               key={index}
@@ -107,7 +117,7 @@ const App: React.FC = () => {
           ))}
         </div>
         <button
-          className="my-2 rounded-md border-2 border-indigo-500 bg-indigo-500 px-4 py-2 font-bold text-white hover:border-indigo-700 hover:bg-indigo-700"
+          className="mb-2 mr-2 rounded-md border-2 border-indigo-500 bg-indigo-500 px-4 py-2 font-bold text-white hover:border-indigo-700 hover:bg-indigo-700"
           onClick={generatePDF}
         >
           Generate PDF!
