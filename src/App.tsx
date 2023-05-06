@@ -1,4 +1,4 @@
-import React, { ReactNode, useRef, useState, ChangeEvent, useCallback } from 'react';
+import React, { FC, ReactNode, useRef, useState, ChangeEvent, useCallback } from 'react';
 import ReactDOMServer from 'react-dom/server';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -61,11 +61,13 @@ const markdownComponents: {
     <strong className="font-bold" {...props} />
   ),
   hr: ({ node, ...props }: MarkdownComponentProps) => <hr className="border-gray-300" {...props} />,
-  a: ({ node, ...props }: MarkdownComponentProps) => <a className="text-blue-600" {...props} />,
+  a: ({ node, ...props }: MarkdownComponentProps) => (
+    <a className="text-blue-600" {...props} target="_blank" rel="noopener noreferrer" />
+  ),
   img: ({ node, ...props }: MarkdownComponentProps) => <img className="max-w-full" {...props} />,
 };
 
-const App: React.FC = () => {
+const App: FC = () => {
   const [columns, setColumns] = useState<string[]>(['', '', '']);
 
   const handleColumnChange = useCallback(
@@ -78,6 +80,19 @@ const App: React.FC = () => {
     },
     []
   );
+
+  const handleAddColumn = useCallback(() => {
+    setColumns((prevColumns) => [...prevColumns, '']);
+  }, []);
+
+  const handleRemoveColumn = useCallback(() => {
+    setColumns((prevColumns) => {
+      if (prevColumns.length > 1) {
+        return prevColumns.slice(0, prevColumns.length - 1);
+      }
+      return prevColumns;
+    });
+  }, []);
 
   const markdownContainerRef = useRef<HTMLDivElement>(null);
 
@@ -250,6 +265,19 @@ const App: React.FC = () => {
           ))}
         </div>
         <div className="inline-flex">
+          <button
+            className="mb-2 mr-2 w-1/4 rounded-md border-2 border-red-500 bg-red-500 px-4 py-2 font-bold text-white hover:border-red-700 hover:bg-red-700"
+            onClick={handleAddColumn}
+          >
+            Add Column
+          </button>
+          <button
+            className="mb-2 mr-2 w-1/4 rounded-md border-2 border-red-500 bg-red-500 px-4 py-2 font-bold text-white hover:border-red-700 hover:bg-red-700"
+            onClick={handleRemoveColumn}
+          >
+            Delete Column
+          </button>
+
           <button
             className="mb-2 mr-2 w-1/2 rounded-md border-2 border-indigo-500 bg-indigo-500 px-4 py-2 font-bold text-white hover:border-indigo-700 hover:bg-indigo-700"
             onClick={generatePDF}
